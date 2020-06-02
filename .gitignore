@@ -1,2 +1,4 @@
 .idea/
 testLambda.zip
+.terraform/
+terraform.tfstate*

@@ -1,21 +1,17 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
-json_response="$(aws apigateway get-rest-apis --profile $USER_PROFILE)"
-set -- "$(python2 getTestIDsFromApiJsonRS.py 'quarkusVsJava-api' 'name' <<< "${json_response}")"
-api_id=$1
-json_response="$(aws apigateway get-resources --rest-api-id $api_id --profile $USER_PROFILE)"
-resource_ids="$(python2 getTestIDsFromApiJsonRS.py 'Test' 'path' <<< "${json_response}")"
+api_id=$(terraform output api_gateway_id)
 
-for resource_id in ${resource_ids}
-do
-    if [[ -z "$USER_PROFILE" ]]
-    then
-        json_response="$(aws apigateway test-invoke-method --rest-api-id $api_id --resource-id $resource_id --http-method "GET" )"
-    else
-        json_response="$(aws apigateway test-invoke-method --rest-api-id $api_id --resource-id $resource_id --http-method "GET" \
-                          --profile $USER_PROFILE)"
-    fi
+# grab ids that have resource method
+resource_ids="$(aws apigateway get-resources --rest-api-id $api_id --query 'items[?resourceMethods].[id,path]' --output text)"
 
-    echo "$(python2 -c "import sys, json; print json.load(sys.stdin)['body'] " <<< "${json_response}")"
+IFS=$'\n'
+for resource_id in ${resource_ids}; do
+    id=$(echo $resource_id | cut -f1)
+    name=$(echo $resource_id | cut -f2)
+
+    echo "Testing $name"
+    json_response="$(aws apigateway test-invoke-method --rest-api-id $api_id --resource-id $id --http-method "GET")"
+    python -c "import sys, json; print json.load(sys.stdin)['body']" <<< "${json_response}"
     echo
 done
