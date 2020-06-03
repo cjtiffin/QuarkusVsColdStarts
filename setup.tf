@@ -137,19 +137,23 @@ module "quarkus" {
 ###########################################################
 # Quarkus w/ GraalVM Lambda setup
 ###########################################################
-module "quarkusGraal" {
-  source = "setup_lambda"
+# module "quarkusGraal" {
+#   source = "setup_lambda"
 
-  api_gateway_name = "${aws_api_gateway_rest_api.main.name}"
-  role             = "${aws_iam_role.iam_for_lambda.arn}"
 
-  name     = "quarkusGraal"
-  runtime  = "provided"
-  handler  = "any.name.not.used"
-  folder   = "QuarkusGraal"
-  filename = "target/function.zip"
+#   api_gateway_name = "${aws_api_gateway_rest_api.main.name}"
+#   role             = "${aws_iam_role.iam_for_lambda.arn}"
 
-  environment = {
-    DISABLE_SIGNAL_HANDLERS = true
-  }
-}
+
+#   name     = "quarkusGraal"
+#   runtime  = "provided"
+#   handler  = "any.name.not.used"
+#   folder   = "QuarkusGraal"
+#   filename = "target/function.zip"
+
+
+#   environment = {
+#     DISABLE_SIGNAL_HANDLERS = "true"
+#   }
+# }
+
